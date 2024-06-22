@@ -1,0 +1,12 @@
+[package]
+name = "strings-experiment"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+divan = "0.1.14"
+fxhash = "0.2.1"
+
+[[bench]]
+name = "meow"
+harness = false
