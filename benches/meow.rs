@@ -1,14 +1,24 @@
-use fxhash;
-use twox_hash;
+use std::hash::Hasher;
 
 use divan;
-use paste::paste;
 
 macro_rules! generate_functions {
-    ($name: expr, $hash_fn: expr) => {
-        paste! {
+    ($name: ident, $hash_fn: expr) => {
+        #[divan::bench_group]
+        #[allow(unused)]
+        mod $name {
+            use paste::paste;
+            use meowhash as _meowhash;
+            use fasthash::metro as _metro;
+            use crate::{
+                __ahash_hash,
+                __default_hash
+            };
+            use fxhash as _fxhash;
+            use ahash as _ahash;
+            paste! {
             #[divan::bench]
-            fn [<$name _short>]() -> bool {
+            fn short() -> bool {
                 let a = $hash_fn(include_bytes!("../article1.txt"));
                 let b = $hash_fn(include_bytes!("../article2.txt"));
 
@@ -17,7 +27,7 @@ macro_rules! generate_functions {
             }
 
             #[divan::bench]
-            fn [<$name _long>]() -> bool {
+            fn long() -> bool {
                 let a = $hash_fn(include_bytes!("../article3.txt"));
                 let b = $hash_fn(include_bytes!("../article4.txt"));
 
@@ -26,19 +36,38 @@ macro_rules! generate_functions {
             }
 
             #[divan::bench]
-            fn [<$name _true>]() -> bool {
+            fn equal() -> bool {
                 let a = $hash_fn(include_bytes!("../article4.txt"));
                 let b = $hash_fn(include_bytes!("../article5.txt"));
 
                 // True
                 a == b
-            }
+            }}
         }
     };
 }
 
-generate_functions!(fxhash, fxhash::hash);
+generate_functions!(fxhash, _fxhash::hash);
 generate_functions!(xxh3, twox_hash::xxh3::hash64);
+generate_functions!(meowhash, _meowhash::MeowHasher::hash);
+generate_functions!(ahash, __ahash_hash);
+generate_functions!(fasthash, _metro::hash64);
+generate_functions!(default_hasher, __default_hash);
+
+#[inline(always)]
+fn __ahash_hash(input: &[u8]) -> u64 {
+    let mut hasher = ::ahash::AHasher::default();
+    hasher.write(input);
+    hasher.finish()
+}
+
+#[inline]
+fn __default_hash(input: &[u8]) -> u64 {
+    let mut hasher = ::ahash::AHasher::default();
+    hasher.write(input);
+    hasher.finish()
+}
+
 
 #[divan::bench]
 fn comparison_short() -> bool {
