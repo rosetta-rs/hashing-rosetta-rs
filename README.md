@@ -4,8 +4,7 @@ What's faster, hashing a string and comparing the hash, or simply comparing the 
  
 Here are the results in a benchmark done in my machine:
 
-plain
-```
+```plain
 meow                 fastest       │ slowest       │ median        │ mean          │ samples │ iters
 ├─ comparison_long   0.002 ns      │ 0.183 ns      │ 0.07 ns       │ 0.048 ns      │ 100     │ 819200
 ├─ comparison_short  0.069 ns      │ 0.07 ns       │ 0.07 ns       │ 0.07 ns       │ 100     │ 819200
