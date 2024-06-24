@@ -43,4 +43,4 @@ meow                 fastest       │ slowest       │ median        │ mean 
    ╰─ short          6.792 µs      │ 20.25 µs      │ 6.852 µs      │ 7.123 µs      │ 100     │ 100
 ```
 
-As you can see, the default `stringA == stringB` is about 10^6 times faster than the fastest hashing algorithm (`xxh3`). So yeah, hashing is slower than comparing (at least in Rust). This was tested on the `article*.txt` files you see on the file tree.
+As you can see, the default `stringA == stringB` is about 10^6 times faster than the fastest hashing algorithm ([`rustc-hash`](https://crates.io/crates/rustc-hash)). So yeah, hashing is slower than comparing (at least in Rust). This was tested on the `article*.txt` files you see on the file tree.
