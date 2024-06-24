@@ -7,9 +7,11 @@ edition = "2021"
 ahash = "0.8.11"
 divan = "0.1.14"
 fasthash = "0.4.0"
+fnv = "1.0.7"
 fxhash = "0.2.1"
 meowhash = "0.3.0"
 paste = "1.0.15"
+rustc-hash = { version = "2.0.0", features = ["nightly"] }
 twox-hash = "1.6.3"
 
 

@@ -10,12 +10,11 @@ macro_rules! generate_functions {
             use paste::paste;
             use meowhash as _meowhash;
             use fasthash::metro as _metro;
-            use crate::{
-                __ahash_hash,
-                __default_hash
-            };
+            use crate::__hash;
             use fxhash as _fxhash;
             use ahash as _ahash;
+            use fnv as _fnv;
+            use std::hash::DefaultHasher;
             paste! {
             #[divan::bench]
             fn short() -> bool {
@@ -50,20 +49,15 @@ macro_rules! generate_functions {
 generate_functions!(fxhash, _fxhash::hash);
 generate_functions!(xxh3, twox_hash::xxh3::hash64);
 generate_functions!(meowhash, _meowhash::MeowHasher::hash);
-generate_functions!(ahash, __ahash_hash);
+generate_functions!(ahash, __hash::<::ahash::AHasher>);
 generate_functions!(fasthash, _metro::hash64);
-generate_functions!(default_hasher, __default_hash);
+generate_functions!(default_hasher, __hash::<DefaultHasher>);
+generate_functions!(rustc_hash, __hash::<::rustc_hash::FxHasher>);
+generate_functions!(fnv, __hash::<::fnv::FnvHasher>);
 
-#[inline(always)]
-fn __ahash_hash(input: &[u8]) -> u64 {
-    let mut hasher = ::ahash::AHasher::default();
-    hasher.write(input);
-    hasher.finish()
-}
 
-#[inline]
-fn __default_hash(input: &[u8]) -> u64 {
-    let mut hasher = ::ahash::AHasher::default();
+fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
+    let mut hasher = H::default();
     hasher.write(input);
     hasher.finish()
 }

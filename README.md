@@ -6,33 +6,41 @@ Here are the results in a benchmark done in my machine:
 
 ```plain
 meow                 fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ comparison_long   0.002 ns      │ 0.183 ns      │ 0.07 ns       │ 0.048 ns      │ 100     │ 819200
-├─ comparison_short  0.069 ns      │ 0.07 ns       │ 0.07 ns       │ 0.07 ns       │ 100     │ 819200
-├─ comparison_true   0.002 ns      │ 0.071 ns      │ 0.003 ns      │ 0.034 ns      │ 100     │ 819200
+├─ comparison_long   0.004 ns      │ 0.008 ns      │ 0.004 ns      │ 0.005 ns      │ 100     │ 819200
+├─ comparison_short  0.003 ns      │ 12.08 ns      │ 0.004 ns      │ 0.167 ns      │ 100     │ 819200
+├─ comparison_true   0.001 ns      │ 0.001 ns      │ 0.001 ns      │ 0.001 ns      │ 100     │ 1638400
 ├─ ahash                           │               │               │               │         │
-│  ├─ equal          499.4 µs      │ 814.6 µs      │ 516.1 µs      │ 518.1 µs      │ 100     │ 100
-│  ├─ long           509 µs        │ 796.8 µs      │ 527.4 µs      │ 541.6 µs      │ 100     │ 100
-│  ╰─ short          10.06 µs      │ 26 µs         │ 10.24 µs      │ 10.53 µs      │ 100     │ 100
+│  ├─ equal          480.2 µs      │ 807 µs        │ 512.8 µs      │ 524.2 µs      │ 100     │ 100
+│  ├─ long           522 µs        │ 840.2 µs      │ 535.4 µs      │ 553.3 µs      │ 100     │ 100
+│  ╰─ short          10.05 µs      │ 26.93 µs      │ 10.09 µs      │ 10.26 µs      │ 100     │ 100
 ├─ default_hasher                  │               │               │               │         │
-│  ├─ equal          499.7 µs      │ 872.6 µs      │ 510.2 µs      │ 525.1 µs      │ 100     │ 100
-│  ├─ long           514 µs        │ 869.4 µs      │ 532.8 µs      │ 550.1 µs      │ 100     │ 100
-│  ╰─ short          9.807 µs      │ 25.19 µs      │ 9.837 µs      │ 10.1 µs       │ 100     │ 100
+│  ├─ equal          1.414 ms      │ 1.925 ms      │ 1.428 ms      │ 1.453 ms      │ 100     │ 100
+│  ├─ long           1.458 ms      │ 1.764 ms      │ 1.487 ms      │ 1.517 ms      │ 100     │ 100
+│  ╰─ short          28.61 µs      │ 42.99 µs      │ 29.17 µs      │ 29.27 µs      │ 100     │ 100
 ├─ fasthash                        │               │               │               │         │
-│  ├─ equal          648.8 µs      │ 984.5 µs      │ 650.1 µs      │ 674.4 µs      │ 100     │ 100
-│  ├─ long           707.1 µs      │ 952.4 µs      │ 739.2 µs      │ 758.4 µs      │ 100     │ 100
-│  ╰─ short          13.3 µs       │ 18.48 µs      │ 13.32 µs      │ 13.47 µs      │ 100     │ 100
+│  ├─ equal          721.4 µs      │ 1.017 ms      │ 721.9 µs      │ 740.6 µs      │ 100     │ 100
+│  ├─ long           766.1 µs      │ 1.237 ms      │ 791.3 µs      │ 833.2 µs      │ 100     │ 100
+│  ╰─ short          14.19 µs      │ 29.59 µs      │ 14.2 µs       │ 14.38 µs      │ 100     │ 100
+├─ fnv                             │               │               │               │         │
+│  ├─ equal          7.105 ms      │ 8.608 ms      │ 7.196 ms      │ 7.231 ms      │ 100     │ 100
+│  ├─ long           7.115 ms      │ 8.105 ms      │ 7.197 ms      │ 7.229 ms      │ 100     │ 100
+│  ╰─ short          139.2 µs      │ 163.5 µs      │ 139.2 µs      │ 139.9 µs      │ 100     │ 100
 ├─ fxhash                          │               │               │               │         │
-│  ├─ equal          1.08 ms       │ 1.164 ms      │ 1.081 ms      │ 1.086 ms      │ 100     │ 100
-│  ├─ long           1.083 ms      │ 1.125 ms      │ 1.089 ms      │ 1.093 ms      │ 100     │ 100
-│  ╰─ short          21.19 µs      │ 29.17 µs      │ 21.2 µs       │ 21.47 µs      │ 100     │ 100
+│  ├─ equal          1.109 ms      │ 1.507 ms      │ 1.115 ms      │ 1.145 ms      │ 100     │ 100
+│  ├─ long           1.113 ms      │ 1.229 ms      │ 1.128 ms      │ 1.134 ms      │ 100     │ 100
+│  ╰─ short          21.76 µs      │ 46.67 µs      │ 21.76 µs      │ 22.09 µs      │ 100     │ 100
 ├─ meowhash                        │               │               │               │         │
-│  ├─ equal          880.9 µs      │ 1.397 ms      │ 916.2 µs      │ 1.099 ms      │ 100     │ 100
-│  ├─ long           901.5 µs      │ 1.391 ms      │ 969.7 µs      │ 1.114 ms      │ 100     │ 100
-│  ╰─ short          17.52 µs      │ 30.82 µs      │ 17.65 µs      │ 19.7 µs       │ 100     │ 100
+│  ├─ equal          893.8 µs      │ 1.402 ms      │ 905.6 µs      │ 1.013 ms      │ 100     │ 100
+│  ├─ long           900.1 µs      │ 1.417 ms      │ 981.3 µs      │ 1.096 ms      │ 100     │ 100
+│  ╰─ short          26.23 µs      │ 52.19 µs      │ 26.78 µs      │ 26.86 µs      │ 100     │ 100
+├─ rustc_hash                      │               │               │               │         │
+│  ├─ equal          333.3 µs      │ 448.6 µs      │ 348 µs        │ 350.6 µs      │ 100     │ 100
+│  ├─ long           353 µs        │ 609.1 µs      │ 368.2 µs      │ 385.4 µs      │ 100     │ 100
+│  ╰─ short          6.551 µs      │ 10.53 µs      │ 6.562 µs      │ 6.604 µs      │ 100     │ 100
 ╰─ xxh3                            │               │               │               │         │
-   ├─ equal          356 µs        │ 813.3 µs      │ 422.9 µs      │ 412.6 µs      │ 100     │ 100
-   ├─ long           376.2 µs      │ 767.9 µs      │ 455.7 µs      │ 459.1 µs      │ 100     │ 100
-   ╰─ short          6.801 µs      │ 22.18 µs      │ 6.851 µs      │ 7.002 µs      │ 100     │ 100
+   ├─ equal          343.8 µs      │ 524.3 µs      │ 423.4 µs      │ 405 µs        │ 100     │ 100
+   ├─ long           370.8 µs      │ 550.7 µs      │ 389.9 µs      │ 408.7 µs      │ 100     │ 100
+   ╰─ short          6.792 µs      │ 20.25 µs      │ 6.852 µs      │ 7.123 µs      │ 100     │ 100
 ```
 
 As you can see, the default `stringA == stringB` is about 10^6 times faster than the fastest hashing algorithm (`xxh3`). So yeah, hashing is slower than comparing (at least in Rust). This was tested on the `article*.txt` files you see on the file tree.
