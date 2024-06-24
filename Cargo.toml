@@ -5,14 +5,19 @@ edition = "2021"
 
 [dependencies]
 ahash = "0.8.11"
+cityhasher = "0.1.0"
 divan = "0.1.14"
 fasthash = "0.4.0"
 fnv = "1.0.7"
 fxhash = "0.2.1"
+gxhash = "3.4.1"
+highway = "1.2.0"
 meowhash = "0.3.0"
 paste = "1.0.15"
 rustc-hash = { version = "2.0.0", features = ["nightly"] }
 twox-hash = "1.6.3"
+wyhash = "0.5.0"
+xxhash-rust = { version = "0.8.10", features = ["xxh3"] }
 
 
 [[bench]]

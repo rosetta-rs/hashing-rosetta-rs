@@ -54,6 +54,11 @@ generate_functions!(fasthash, _metro::hash64);
 generate_functions!(default_hasher, __hash::<DefaultHasher>);
 generate_functions!(rustc_hash, __hash::<::rustc_hash::FxHasher>);
 generate_functions!(fnv, __hash::<::fnv::FnvHasher>);
+generate_functions!(xxhash_rust_xxh3, __hash::<::xxhash_rust::xxh3::Xxh3>);
+generate_functions!(highway, __hash::<::highway::HighwayHasher>);
+generate_functions!(cityhasher, __hash::<::cityhasher::CityHasher>);
+generate_functions!(gxhash, __hash::<::gxhash::GxHasher>);
+generate_functions!(wyhash, __hash::<::wyhash::WyHash>);
 
 
 fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
