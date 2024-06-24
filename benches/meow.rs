@@ -59,6 +59,8 @@ generate_functions!(highway, __hash::<::highway::HighwayHasher>);
 generate_functions!(cityhasher, __hash::<::cityhasher::CityHasher>);
 generate_functions!(gxhash, __hash::<::gxhash::GxHasher>);
 generate_functions!(wyhash, __hash::<::wyhash::WyHash>);
+generate_functions!(blake3, ::blake3::hash);
+generate_functions!(hud_slice_by_8, __hash::<::hud_slice_by_8::crc32::CRC32Hasher>);
 
 
 fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
