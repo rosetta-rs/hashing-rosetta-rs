@@ -15,33 +15,29 @@ macro_rules! generate_functions {
             use ahash as _ahash;
             use fnv as _fnv;
             use std::hash::DefaultHasher;
-            paste! {
             #[divan::bench]
-            fn short() -> bool {
-                let a = $hash_fn(include_bytes!("../article1.txt"));
-                let b = $hash_fn(include_bytes!("../article2.txt"));
-
-                // False
-                a == b
+            fn _3_bytes() {
+                $hash_fn(&[0xd4, 0x23, 0x01]);
             }
-
             #[divan::bench]
-            fn long() -> bool {
-                let a = $hash_fn(include_bytes!("../article3.txt"));
-                let b = $hash_fn(include_bytes!("../article4.txt"));
-
-                // False
-                a == b
+            fn _10_bytes() {
+                $hash_fn(&[0xd4, 0x23, 0x01, 0x2a, 0x40, 0xb7, 0x42, 0x92, 0xe5, 0x35]);
             }
-
             #[divan::bench]
-            fn equal() -> bool {
-                let a = $hash_fn(include_bytes!("../article4.txt"));
-                let b = $hash_fn(include_bytes!("../article5.txt"));
-
-                // True
-                a == b
-            }}
+            fn _30_bytes() {
+                $hash_fn(&[86, 222, 109, 153, 157, 251, 151, 200, 214, 152, 242, 196, 110, 205, 14, 251,
+                    161, 176, 133, 185, 189, 241, 232, 163, 113, 193,  29, 163,  59, 196, ]);
+            }
+            #[divan::bench]
+            fn _100_bytes() {
+                $hash_fn(&[228, 211, 236, 162, 172, 193,  22, 203, 162, 253, 169,  29,  50, 148,  19, 246, 
+                    120,  13, 137, 153,  47,  33,  31, 217,  18,  70,  66,  32, 249,  86, 189, 117, 
+                    134,  37, 185,  72, 130,  52, 170,  92, 231, 185, 110, 224,  60, 123, 234, 218, 
+                     23, 119, 207, 156,  32,  41, 143,  35, 127, 202, 126, 110, 148, 149, 247, 188, 
+                     71,   2, 169, 206,  38, 147,  23, 249,  88, 230, 228, 236, 164,  32,  87,  95, 
+                    154, 204, 225, 154,  94,  53, 182, 109,  16, 207,  20,  54,  60, 109,  98, 139, 
+                    237,  41, 131, 220, ]);
+            }
         }
     };
 }
@@ -60,8 +56,10 @@ generate_functions!(cityhasher, __hash::<::cityhasher::CityHasher>);
 generate_functions!(gxhash, __hash::<::gxhash::GxHasher>);
 generate_functions!(wyhash, __hash::<::wyhash::WyHash>);
 generate_functions!(blake3, ::blake3::hash);
-generate_functions!(hud_slice_by_8, __hash::<::hud_slice_by_8::crc32::CRC32Hasher>);
-
+generate_functions!(
+    hud_slice_by_8,
+    __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
+);
 
 fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
     let mut hasher = H::default();
@@ -69,34 +67,7 @@ fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
     hasher.finish()
 }
 
-
-#[divan::bench]
-fn comparison_short() -> bool {
-    let a = include_str!("../article1.txt");
-    let b = include_str!("../article2.txt");
-
-    // False
-    a == b
-}
-
-#[divan::bench]
-fn comparison_long() -> bool {
-    let a = include_str!("../article3.txt");
-    let b = include_str!("../article4.txt");
-
-    // False
-    a == b
-}
-
-#[divan::bench]
-fn comparison_true()-> bool {
-    let a = include_str!("../article4.txt");
-    let b = include_str!("../article5.txt");
-
-    // True
-    a == b
-}
-
 fn main() {
     divan::main();
 }
+

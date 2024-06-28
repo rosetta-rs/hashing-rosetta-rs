@@ -12,6 +12,7 @@ fasthash = "0.4.0"
 fnv = "1.0.7"
 fxhash = "0.2.1"
 gxhash = "3.4.1"
+# gxhash = { version = "3.4.1", features = ["hybrid"] } # This would be a performance improvement, not supported in all CPUs
 highway = "1.2.0"
 hud-slice-by-8 = "1.0.9"
 meowhash = "0.3.0"
@@ -23,5 +24,9 @@ xxhash-rust = { version = "0.8.10", features = ["xxh3"] }
 
 
 [[bench]]
-name = "meow"
+name = "hashing"
+harness = false
+
+[[bench]]
+name = "small"
 harness = false
