@@ -1,4 +1,4 @@
-use std::hash::Hasher;
+use std::{hash::Hasher, hint::black_box};
 
 use divan;
 
@@ -15,11 +15,12 @@ macro_rules! generate_functions {
             use meowhash as _meowhash;
             use paste::paste;
             use std::hash::DefaultHasher;
+            use std::hint::black_box;
             paste! {
             #[divan::bench]
             fn short() -> bool {
-                let a = $hash_fn(include_bytes!("../article1.txt"));
-                let b = $hash_fn(include_bytes!("../article2.txt"));
+                let a = $hash_fn(black_box(include_bytes!("../article1.txt")));
+                let b = $hash_fn(black_box(include_bytes!("../article2.txt")));
 
                 // False
                 a == b
@@ -27,8 +28,8 @@ macro_rules! generate_functions {
 
             #[divan::bench]
             fn long() -> bool {
-                let a = $hash_fn(include_bytes!("../article3.txt"));
-                let b = $hash_fn(include_bytes!("../article4.txt"));
+                let a = $hash_fn(black_box(include_bytes!("../article3.txt")));
+                let b = $hash_fn(black_box(include_bytes!("../article4.txt")));
 
                 // False
                 a == b
@@ -36,8 +37,8 @@ macro_rules! generate_functions {
 
             #[divan::bench]
             fn equal() -> bool {
-                let a = $hash_fn(include_bytes!("../article4.txt"));
-                let b = $hash_fn(include_bytes!("../article5.txt"));
+                let a = $hash_fn(black_box(include_bytes!("../article4.txt")));
+                let b = $hash_fn(black_box(include_bytes!("../article5.txt")));
 
                 // True
                 a == b
@@ -73,8 +74,8 @@ fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
 
 #[divan::bench]
 fn comparison_short() -> bool {
-    let a = include_str!("../article1.txt");
-    let b = include_str!("../article2.txt");
+    let a = black_box(include_str!("../article1.txt"));
+    let b = black_box(include_str!("../article2.txt"));
 
     // False
     a == b
@@ -82,8 +83,8 @@ fn comparison_short() -> bool {
 
 #[divan::bench]
 fn comparison_long() -> bool {
-    let a = include_str!("../article3.txt");
-    let b = include_str!("../article4.txt");
+    let a = black_box(include_str!("../article3.txt"));
+    let b = black_box(include_str!("../article4.txt"));
 
     // False
     a == b
@@ -91,8 +92,8 @@ fn comparison_long() -> bool {
 
 #[divan::bench]
 fn comparison_true() -> bool {
-    let a = include_str!("../article4.txt");
-    let b = include_str!("../article5.txt");
+    let a = black_box(include_str!("../article4.txt"));
+    let b = black_box(include_str!("../article5.txt"));
 
     // True
     a == b
