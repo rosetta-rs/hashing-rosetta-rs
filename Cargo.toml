@@ -1,7 +1,10 @@
 [package]
-name = "strings-experiment"
+name = "hash-rosetta-rs"
+authors = ["Alejandra Gonzalez <blyxyas@gmail.com>"]
 version = "0.1.0"
 edition = "2021"
+readme = "README.md"
+repository = "https://github.com/blyxyas/hash-rosetta-rs"
 
 [dependencies]
 ahash = "0.8.11"

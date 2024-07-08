@@ -250,6 +250,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "hash-rosetta-rs"
+version = "0.1.0"
+dependencies = [
+ "ahash",
+ "blake3",
+ "cityhasher",
+ "divan",
+ "fasthash",
+ "fnv",
+ "fxhash",
+ "gxhash",
+ "highway",
+ "hud-slice-by-8",
+ "meowhash",
+ "paste",
+ "rustc-hash",
+ "twox-hash",
+ "wyhash",
+ "xxhash-rust",
+]
+
+[[package]]
 name = "highway"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -439,28 +461,6 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
-
-[[package]]
-name = "strings-experiment"
-version = "0.1.0"
-dependencies = [
- "ahash",
- "blake3",
- "cityhasher",
- "divan",
- "fasthash",
- "fnv",
- "fxhash",
- "gxhash",
- "highway",
- "hud-slice-by-8",
- "meowhash",
- "paste",
- "rustc-hash",
- "twox-hash",
- "wyhash",
- "xxhash-rust",
-]
 
 [[package]]
 name = "syn"

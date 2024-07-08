@@ -222,4 +222,4 @@ As you can see, the default `stringA == stringB` is about 10^6 times faster than
 
 (Git and Cargo must be installed)
 
-Just clone this repo with `git clone https://github.com/blyxyas/strings-experiment` or download the ZIP with the green button, and run `cargo bench`.
+Just clone this repo with `git clone https://github.com/blyxyas/hash-rosetta-rs` or download the ZIP with the green button, and run `cargo bench`.
