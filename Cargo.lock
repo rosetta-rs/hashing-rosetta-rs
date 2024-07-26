@@ -279,9 +279,9 @@ checksum = "c706f1711006204c2ba8fb1a7bd55f689bbf7feca9ff40325206b5e140cff6df"
 
 [[package]]
 name = "hud-slice-by-8"
-version = "1.0.9"
+version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "80ffc6db8c1fac5a88e84d8e81c255adaf1d6f07292fb706256b611f7e9401b1"
+checksum = "857e8f202d19252180e0f6969b1ee12580a1626af389c19d4f4d4a2ee5659a0a"
 dependencies = [
  "cc",
 ]
