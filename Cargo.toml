@@ -23,7 +23,7 @@ paste = "1.0.15"
 rustc-hash = { version = "2.0.0", features = ["nightly"] }
 twox-hash = "1.6.3"
 wyhash = "0.5.0"
-xxhash-rust = { version = "0.8.11", features = ["xxh3"] }
+xxhash-rust = { version = "0.8.12", features = ["xxh3"] }
 
 
 [[bench]]
