@@ -17,7 +17,7 @@ fxhash = "0.2.1"
 gxhash = "3.4.1"
 # gxhash = { version = "3.4.1", features = ["hybrid"] } # This would be a performance improvement, not supported in all CPUs
 highway = "1.2.0"
-hud-slice-by-8 = "1.0.9"
+hud-slice-by-8 = "1.0.10"
 meowhash = "0.3.0"
 paste = "1.0.15"
 rustc-hash = { version = "2.0.0", features = ["nightly"] }
