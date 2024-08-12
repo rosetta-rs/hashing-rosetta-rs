@@ -214,6 +214,8 @@ small                   fastest       │ slowest       │ median        │ me
 
 As you can see, the default `stringA == stringB` is about 10^6 times faster than the fastest hashing algorithm. So yeah, hashing is slower than comparing (at least in Rust). This was tested on the `article*.txt` files you see on the file tree.
 
+To see the full Criterion report [check here](https://github.com/rosetta-rs/hashing-rosetta-rs/blob/master/criterion.tar.gz)
+
 ## Running the benchmarks yourself
 
 (Git and Cargo must be installed)
