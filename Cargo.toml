@@ -10,20 +10,20 @@ repository = "https://github.com/blyxyas/hash-rosetta-rs"
 ahash = "0.8.11"
 blake3 = "1.5.1"
 cityhasher = "0.1.0"
-criterion = "0.5.1"
+divan = "0.1.14"
 fasthash = "0.4.0"
 fnv = "1.0.7"
 fxhash = "0.2.1"
 gxhash = "3.4.1"
 # gxhash = { version = "3.4.1", features = ["hybrid"] } # This would be a performance improvement, not supported in all CPUs
 highway = "1.2.0"
-hud-slice-by-8 = "1.0.10"
+hud-slice-by-8 = "1.0.9"
 meowhash = "0.3.0"
 paste = "1.0.15"
 rustc-hash = { version = "2.0.0", features = ["nightly"] }
 twox-hash = "1.6.3"
 wyhash = "0.5.0"
-xxhash-rust = { version = "0.8.12", features = ["xxh3"] }
+xxhash-rust = { version = "0.8.11", features = ["xxh3"] }
 
 
 [[bench]]
