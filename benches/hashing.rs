@@ -17,7 +17,7 @@ fn benchmark_short(c: &mut Criterion) {
         }};
     }
 
-    generate_functions!(xxh3, twox_hash::xxh3::hash64);
+    generate_functions!(xxh3, twox_hash::xxhash3_64::Hasher::oneshot);
     generate_functions!(meowhash, meowhash::MeowHasher::hash);
     generate_functions!(ahash, __hash::<::ahash::AHasher>);
     generate_functions!(fasthash, fasthash::metro::hash64);
@@ -53,7 +53,7 @@ fn benchmark_long(c: &mut Criterion) {
         }};
     }
 
-    generate_functions!(xxh3, twox_hash::xxh3::hash64);
+    generate_functions!(xxh3, twox_hash::xxhash3_64::Hasher::oneshot);
     generate_functions!(meowhash, meowhash::MeowHasher::hash);
     generate_functions!(ahash, __hash::<::ahash::AHasher>);
     generate_functions!(fasthash, fasthash::metro::hash64);
@@ -88,7 +88,7 @@ fn benchmark_equal(c: &mut Criterion) {
         }};
     }
 
-    generate_functions!(xxh3, twox_hash::xxh3::hash64);
+    generate_functions!(xxh3, twox_hash::xxhash3_64::Hasher::oneshot);
     generate_functions!(meowhash, meowhash::MeowHasher::hash);
     generate_functions!(ahash, __hash::<::ahash::AHasher>);
     generate_functions!(fasthash, fasthash::metro::hash64);
@@ -114,7 +114,7 @@ fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
 }
 
 fn bench_comparison(c: &mut Criterion) {
-    let mut group = c.benchmark_group("== comparsion");
+    let mut group = c.benchmark_group("== comparison");
     group.bench_function("short", |b| b.iter(|| comparison_short()));
     group.bench_function("long", |b| b.iter(|| comparison_long()));
     group.bench_function("true", |b| b.iter(|| comparison_true()));

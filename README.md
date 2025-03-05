@@ -1,215 +1,390 @@
-# String comparison experiment
+# Rosetta hashing experiment
 
 What's faster, hashing a string and comparing the hash, or simply comparing the string? This Rust benchmark measures just that.
  
-Here are the results in a benchmark done in my machine:
+Here are the results in a benchmark done in my machine, with an AMD Ryzen 5 2600 CPU.
 
 <!-- Benchmark here -->
 
 ```plain
-Timer precision: 23 ns
-hashing              fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ comparison_long   3.23 ns       │ 3.236 ns      │ 3.231 ns      │ 3.232 ns      │ 100     │ 102400
-├─ comparison_short  3.231 ns      │ 12.12 ns      │ 3.233 ns      │ 3.334 ns      │ 100     │ 102400
-├─ comparison_true   143.1 µs      │ 1.787 ms      │ 144.5 µs      │ 163.2 µs      │ 100     │ 100
-├─ ahash                           │               │               │               │         │
-│  ├─ equal          365.8 µs      │ 1.913 ms      │ 375 µs        │ 394.2 µs      │ 100     │ 100
-│  ├─ long           365.4 µs      │ 1.755 ms      │ 374.5 µs      │ 388.6 µs      │ 100     │ 100
-│  ╰─ short          6.427 µs      │ 62.46 µs      │ 6.489 µs      │ 7.146 µs      │ 100     │ 100
-├─ blake3                          │               │               │               │         │
-│  ├─ equal          4.337 ms      │ 7.094 ms      │ 4.874 ms      │ 4.941 ms      │ 100     │ 100
-│  ├─ long           4.491 ms      │ 6.591 ms      │ 4.813 ms      │ 4.891 ms      │ 100     │ 100
-│  ╰─ short          93.45 µs      │ 118.7 µs      │ 93.57 µs      │ 94.71 µs      │ 100     │ 100
-├─ cityhasher                      │               │               │               │         │
-│  ├─ equal          675.5 µs      │ 2.43 ms       │ 720.7 µs      │ 763.3 µs      │ 100     │ 100
-│  ├─ long           649.7 µs      │ 2.627 ms      │ 716.3 µs      │ 744.8 µs      │ 100     │ 100
-│  ╰─ short          12.73 µs      │ 111.2 µs      │ 12.78 µs      │ 13.89 µs      │ 100     │ 100
-├─ default_hasher                  │               │               │               │         │
-│  ├─ equal          2.132 ms      │ 3.027 ms      │ 2.343 ms      │ 2.322 ms      │ 100     │ 100
-│  ├─ long           2.322 ms      │ 2.461 ms      │ 2.333 ms      │ 2.343 ms      │ 100     │ 100
-│  ╰─ short          45.12 µs      │ 55.72 µs      │ 45.24 µs      │ 45.57 µs      │ 100     │ 100
-├─ fasthash                        │               │               │               │         │
-│  ├─ equal          378.7 µs      │ 396.8 µs      │ 379.7 µs      │ 383.4 µs      │ 100     │ 100
-│  ├─ long           405.2 µs      │ 556.6 µs      │ 415.8 µs      │ 417.6 µs      │ 100     │ 100
-│  ╰─ short          7.923 µs      │ 20.42 µs      │ 7.976 µs      │ 8.102 µs      │ 100     │ 100
-├─ fnv                             │               │               │               │         │
-│  ├─ equal          8.995 ms      │ 11.08 ms      │ 9.668 ms      │ 9.63 ms       │ 100     │ 100
-│  ├─ long           8.782 ms      │ 10.73 ms      │ 9.113 ms      │ 9.145 ms      │ 100     │ 100
-│  ╰─ short          165 µs        │ 385 µs        │ 170.3 µs      │ 176.8 µs      │ 100     │ 100
-├─ fxhash                          │               │               │               │         │
-│  ├─ equal          1.528 ms      │ 2.738 ms      │ 1.537 ms      │ 1.552 ms      │ 100     │ 100
-│  ├─ long           1.527 ms      │ 2.851 ms      │ 1.536 ms      │ 1.552 ms      │ 100     │ 100
-│  ╰─ short          29.66 µs      │ 84.24 µs      │ 29.66 µs      │ 30.42 µs      │ 100     │ 100
-├─ gxhash                          │               │               │               │         │
-│  ├─ equal          351.6 µs      │ 606.7 µs      │ 354 µs        │ 360.3 µs      │ 100     │ 100
-│  ├─ long           358.1 µs      │ 580.3 µs      │ 364.4 µs      │ 370.7 µs      │ 100     │ 100
-│  ╰─ short          6.411 µs      │ 20.41 µs      │ 6.481 µs      │ 6.705 µs      │ 100     │ 100
-├─ highway                         │               │               │               │         │
-│  ├─ equal          862.4 µs      │ 1.023 ms      │ 872.3 µs      │ 876.9 µs      │ 100     │ 100
-│  ├─ long           860.5 µs      │ 979.7 µs      │ 870.2 µs      │ 872.5 µs      │ 100     │ 100
-│  ╰─ short          16.79 µs      │ 29.05 µs      │ 16.84 µs      │ 17.11 µs      │ 100     │ 100
-├─ hud_slice_by_8                  │               │               │               │         │
-│  ├─ equal          3.574 ms      │ 4.08 ms       │ 3.955 ms      │ 3.882 ms      │ 100     │ 100
-│  ├─ long           3.564 ms      │ 17.53 ms      │ 3.69 ms       │ 3.868 ms      │ 100     │ 100
-│  ╰─ short          69.32 µs      │ 119.1 µs      │ 87.84 µs      │ 86.88 µs      │ 100     │ 100
-├─ meowhash                        │               │               │               │         │
-│  ├─ equal          308.3 µs      │ 727.4 µs      │ 324.4 µs      │ 330.7 µs      │ 100     │ 100
-│  ├─ long           291.4 µs      │ 582.4 µs      │ 300.9 µs      │ 307.5 µs      │ 100     │ 100
-│  ╰─ short          6.084 µs      │ 34.68 µs      │ 6.286 µs      │ 6.941 µs      │ 100     │ 100
-├─ rustc_hash                      │               │               │               │         │
-│  ├─ equal          438.9 µs      │ 803.4 µs      │ 464.9 µs      │ 473.4 µs      │ 100     │ 100
-│  ├─ long           434.5 µs      │ 750.1 µs      │ 462.7 µs      │ 469 µs        │ 100     │ 100
-│  ╰─ short          8.5 µs        │ 28.5 µs       │ 8.792 µs      │ 9.26 µs       │ 100     │ 100
-├─ wyhash                          │               │               │               │         │
-│  ├─ equal          616.2 µs      │ 1.367 ms      │ 655.9 µs      │ 673.9 µs      │ 100     │ 100
-│  ├─ long           636.5 µs      │ 1.076 ms      │ 681.2 µs      │ 700.7 µs      │ 100     │ 100
-│  ╰─ short          11.36 µs      │ 35.87 µs      │ 12.14 µs      │ 13.24 µs      │ 100     │ 100
-├─ xxh3                            │               │               │               │         │
-│  ├─ equal          623.8 µs      │ 1.094 ms      │ 661.1 µs      │ 696.4 µs      │ 100     │ 100
-│  ├─ long           634.5 µs      │ 1.756 ms      │ 998.1 µs      │ 933.2 µs      │ 100     │ 100
-│  ╰─ short          12.11 µs      │ 34.39 µs      │ 12.14 µs      │ 14.61 µs      │ 100     │ 100
-╰─ xxhash_rust_xxh3                │               │               │               │         │
-   ├─ equal          549.6 µs      │ 1.048 ms      │ 585.1 µs      │ 599.6 µs      │ 100     │ 100
-   ├─ long           551.4 µs      │ 951.7 µs      │ 596.4 µs      │ 606 µs        │ 100     │ 100
-   ╰─ short          10.13 µs      │ 40.44 µs      │ 10.19 µs      │ 11.25 µs      │ 100     │ 100
+     Running benches/hashing.rs (target/release/deps/hashing-398dda6a7aeee9d1)
+long article/xxh3       time:   [360.11 µs 365.86 µs 371.83 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+long article/meowhash   time:   [265.79 µs 270.88 µs 276.12 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+long article/ahash      time:   [270.11 µs 273.73 µs 277.40 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+long article/fasthash   time:   [814.09 µs 820.96 µs 827.82 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+Benchmarking long article/default_hasher: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 7.6s, enable flat sampling, or reduce sample count to 50.
+long article/default_hasher
+                        time:   [1.4628 ms 1.4692 ms 1.4756 ms]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+long article/rustc_hash time:   [459.34 µs 466.83 µs 474.46 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  1 (1.00%) low mild
+  3 (3.00%) high mild
+long article/fnv        time:   [7.0690 ms 7.0911 ms 7.1152 ms]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+long article/xxhash_rust_xxh3
+                        time:   [395.06 µs 401.30 µs 408.05 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+long article/highway    time:   [661.28 µs 667.94 µs 674.70 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+long article/cityhasher time:   [493.48 µs 498.47 µs 503.84 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  1 (1.00%) low mild
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+long article/gxhash     time:   [223.53 µs 227.76 µs 231.89 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+long article/wyhash     time:   [450.00 µs 455.09 µs 459.92 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+long article/blake3     time:   [3.1147 ms 3.1561 ms 3.1993 ms]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+long article/hud_slice_by_8
+                        time:   [2.7176 ms 2.7282 ms 2.7391 ms]
+Found 5 outliers among 100 measurements (5.00%)
+  5 (5.00%) high mild
 
-Timer precision: 17 ns
-small                   fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ ahash                              │               │               │               │         │
-│  ├─ _100_bytes        50.68 ns      │ 17.81 µs      │ 67.68 ns      │ 247.9 ns      │ 100     │ 100
-│  ├─ _100_bytes_x1000  27.13 µs      │ 49.97 µs      │ 29.75 µs      │ 31.17 µs      │ 100     │ 100
-│  ├─ _10_bytes         8.903 ns      │ 17.05 ns      │ 8.931 ns      │ 10.53 ns      │ 100     │ 12800
-│  ├─ _10_bytes_x1000   15.26 µs      │ 34.69 µs      │ 16.25 µs      │ 17.01 µs      │ 100     │ 100
-│  ├─ _30_bytes         8.919 ns      │ 109 ns        │ 8.95 ns       │ 11.65 ns      │ 100     │ 12800
-│  ├─ _30_bytes_x1000   14.87 µs      │ 31.48 µs      │ 15.86 µs      │ 16.35 µs      │ 100     │ 100
-│  ├─ _3_bytes          8.317 ns      │ 110.7 ns      │ 8.38 ns       │ 10.03 ns      │ 100     │ 12800
-│  ╰─ _3_bytes_x1000    8.615 µs      │ 15.3 µs       │ 8.625 µs      │ 8.815 µs      │ 100     │ 100
-├─ blake3                             │               │               │               │         │
-│  ├─ _100_bytes        186.6 ns      │ 10.77 µs      │ 242.1 ns      │ 405 ns        │ 100     │ 100
-│  ├─ _100_bytes_x1000  160.6 µs      │ 220.4 µs      │ 183.2 µs      │ 185.3 µs      │ 100     │ 100
-│  ├─ _10_bytes         90.87 ns      │ 878.6 ns      │ 91.02 ns      │ 102.8 ns      │ 100     │ 1600
-│  ├─ _10_bytes_x1000   89.26 µs      │ 129.1 µs      │ 96.92 µs      │ 100.7 µs      │ 100     │ 100
-│  ├─ _30_bytes         91.49 ns      │ 1.045 µs      │ 94.93 ns      │ 111.1 ns      │ 100     │ 1600
-│  ├─ _30_bytes_x1000   89.72 µs      │ 124.6 µs      │ 95.51 µs      │ 98.56 µs      │ 100     │ 100
-│  ├─ _3_bytes          90.68 ns      │ 984.7 ns      │ 94.06 ns      │ 116.4 ns      │ 100     │ 1600
-│  ╰─ _3_bytes_x1000    88.2 µs       │ 180.6 µs      │ 93.92 µs      │ 100 µs        │ 100     │ 100
-├─ cityhasher                         │               │               │               │         │
-│  ├─ _100_bytes        49.68 ns      │ 3.626 µs      │ 52.68 ns      │ 89.95 ns      │ 100     │ 100
-│  ├─ _100_bytes_x1000  31.87 µs      │ 110.2 µs      │ 33.96 µs      │ 35.56 µs      │ 100     │ 100
-│  ├─ _10_bytes         8.837 ns      │ 58.2 ns       │ 9.423 ns      │ 9.763 ns      │ 100     │ 25600
-│  ├─ _10_bytes_x1000   13.91 µs      │ 33.37 µs      │ 14.81 µs      │ 15.97 µs      │ 100     │ 100
-│  ├─ _30_bytes         12.74 ns      │ 12.92 ns      │ 12.8 ns       │ 12.8 ns       │ 100     │ 25600
-│  ├─ _30_bytes_x1000   14.51 µs      │ 101.8 µs      │ 15.45 µs      │ 17.33 µs      │ 100     │ 100
-│  ├─ _3_bytes          9.435 ns      │ 9.477 ns      │ 9.46 ns       │ 9.455 ns      │ 100     │ 25600
-│  ╰─ _3_bytes_x1000    8.499 µs      │ 24.9 µs       │ 9.114 µs      │ 9.8 µs        │ 100     │ 100
-├─ default_hasher                     │               │               │               │         │
-│  ├─ _100_bytes        39.93 ns      │ 242.7 ns      │ 42.82 ns      │ 44.23 ns      │ 100     │ 6400
-│  ├─ _100_bytes_x1000  41.28 µs      │ 62.82 µs      │ 44.05 µs      │ 45.79 µs      │ 100     │ 100
-│  ├─ _10_bytes         15.19 ns      │ 15.98 ns      │ 15.26 ns      │ 15.25 ns      │ 100     │ 12800
-│  ├─ _10_bytes_x1000   17.74 µs      │ 38.98 µs      │ 18.89 µs      │ 20.41 µs      │ 100     │ 100
-│  ├─ _30_bytes         19.78 ns      │ 120.5 ns      │ 20.45 ns      │ 21.35 ns      │ 100     │ 12800
-│  ├─ _30_bytes_x1000   18.96 µs      │ 55.97 µs      │ 19.83 µs      │ 21.22 µs      │ 100     │ 100
-│  ├─ _3_bytes          13.63 ns      │ 150.6 ns      │ 14.1 ns       │ 16.96 ns      │ 100     │ 12800
-│  ╰─ _3_bytes_x1000    12.16 µs      │ 30.32 µs      │ 12.62 µs      │ 13.92 µs      │ 100     │ 100
-├─ fasthash                           │               │               │               │         │
-│  ├─ _100_bytes        17.1 ns       │ 119.3 ns      │ 17.76 ns      │ 20.5 ns       │ 100     │ 12800
-│  ├─ _100_bytes_x1000  28.65 µs      │ 51.46 µs      │ 30.56 µs      │ 32.08 µs      │ 100     │ 100
-│  ├─ _10_bytes         6.966 ns      │ 99.78 ns      │ 7.198 ns      │ 9.098 ns      │ 100     │ 25600
-│  ├─ _10_bytes_x1000   15.31 µs      │ 34.1 µs       │ 16.51 µs      │ 17.64 µs      │ 100     │ 100
-│  ├─ _30_bytes         11.17 ns      │ 64.43 ns      │ 11.91 ns      │ 13.28 ns      │ 100     │ 25600
-│  ├─ _30_bytes_x1000   21.4 µs       │ 42.49 µs      │ 22.77 µs      │ 23.75 µs      │ 100     │ 100
-│  ├─ _3_bytes          7.036 ns      │ 56.83 ns      │ 7.044 ns      │ 7.62 ns       │ 100     │ 25600
-│  ╰─ _3_bytes_x1000    6.69 µs       │ 20.28 µs      │ 6.902 µs      │ 7.484 µs      │ 100     │ 100
-├─ fnv                                │               │               │               │         │
-│  ├─ _100_bytes        1.519 ns      │ 14.41 ns      │ 1.577 ns      │ 1.82 ns       │ 100     │ 102400
-│  ├─ _100_bytes_x1000  106.4 µs      │ 322.1 µs      │ 113.4 µs      │ 122 µs        │ 100     │ 100
-│  ├─ _10_bytes         1.519 ns      │ 46.7 ns       │ 1.52 ns       │ 2.37 ns       │ 100     │ 102400
-│  ├─ _10_bytes_x1000   6.756 µs      │ 20.05 µs      │ 7.056 µs      │ 7.725 µs      │ 100     │ 100
-│  ├─ _30_bytes         1.818 ns      │ 13.59 ns      │ 1.891 ns      │ 1.989 ns      │ 100     │ 102400
-│  ├─ _30_bytes_x1000   24.78 µs      │ 51.03 µs      │ 26.49 µs      │ 28.03 µs      │ 100     │ 100
-│  ├─ _3_bytes          1.82 ns       │ 14.69 ns      │ 1.961 ns      │ 2.26 ns       │ 100     │ 102400
-│  ╰─ _3_bytes_x1000    3.37 µs       │ 9.188 µs      │ 3.373 µs      │ 3.559 µs      │ 100     │ 100
-├─ fxhash                             │               │               │               │         │
-│  ├─ _100_bytes        63.62 ns      │ 450 ns        │ 64.2 ns       │ 68.49 ns      │ 100     │ 3200
-│  ├─ _100_bytes_x1000  18.55 µs      │ 40.92 µs      │ 18.57 µs      │ 20.06 µs      │ 100     │ 100
-│  ├─ _10_bytes         1.518 ns      │ 15.78 ns      │ 1.578 ns      │ 1.842 ns      │ 100     │ 102400
-│  ├─ _10_bytes_x1000   10.32 µs      │ 23.67 µs      │ 10.98 µs      │ 11.15 µs      │ 100     │ 100
-│  ├─ _30_bytes         1.82 ns       │ 14.98 ns      │ 1.959 ns      │ 2.357 ns      │ 100     │ 102400
-│  ├─ _30_bytes_x1000   13.35 µs      │ 121.7 µs      │ 13.77 µs      │ 16.6 µs       │ 100     │ 100
-│  ├─ _3_bytes          1.826 ns      │ 14.11 ns      │ 1.96 ns       │ 2.23 ns       │ 100     │ 102400
-│  ╰─ _3_bytes_x1000    2.405 µs      │ 15.74 µs      │ 2.493 µs      │ 2.606 µs      │ 100     │ 100
-├─ gxhash                             │               │               │               │         │
-│  ├─ _100_bytes        13.56 ns      │ 115.1 ns      │ 14.04 ns      │ 16.11 ns      │ 100     │ 12800
-│  ├─ _100_bytes_x1000  28.84 µs      │ 79.26 µs      │ 30.71 µs      │ 32.29 µs      │ 100     │ 100
-│  ├─ _10_bytes         5.497 ns      │ 30.08 ns      │ 5.513 ns      │ 5.774 ns      │ 100     │ 51200
-│  ├─ _10_bytes_x1000   17.89 µs      │ 31.82 µs      │ 18.46 µs      │ 19.7 µs       │ 100     │ 100
-│  ├─ _30_bytes         8.114 ns      │ 29.98 ns      │ 8.208 ns      │ 8.427 ns      │ 100     │ 25600
-│  ├─ _30_bytes_x1000   21.49 µs      │ 42.19 µs      │ 22.83 µs      │ 24.19 µs      │ 100     │ 100
-│  ├─ _3_bytes          5.308 ns      │ 32 ns         │ 5.496 ns      │ 6.18 ns       │ 100     │ 51200
-│  ╰─ _3_bytes_x1000    17.29 µs      │ 43.3 µs       │ 17.83 µs      │ 18.62 µs      │ 100     │ 100
-├─ highway                            │               │               │               │         │
-│  ├─ _100_bytes        66.68 ns      │ 4.875 µs      │ 75.68 ns      │ 124 ns        │ 100     │ 100
-│  ├─ _100_bytes_x1000  52.8 µs       │ 94.13 µs      │ 53.8 µs       │ 56.92 µs      │ 100     │ 100
-│  ├─ _10_bytes         40.32 ns      │ 312.7 ns      │ 41.74 ns      │ 44.19 ns      │ 100     │ 6400
-│  ├─ _10_bytes_x1000   38.89 µs      │ 223.4 µs      │ 43.36 µs      │ 47.45 µs      │ 100     │ 100
-│  ├─ _30_bytes         45.18 ns      │ 45.7 ns       │ 45.57 ns      │ 45.59 ns      │ 100     │ 6400
-│  ├─ _30_bytes_x1000   41.84 µs      │ 67.45 µs      │ 44.54 µs      │ 46.42 µs      │ 100     │ 100
-│  ├─ _3_bytes          40.13 ns      │ 255.1 ns      │ 41.6 ns       │ 45.61 ns      │ 100     │ 6400
-│  ╰─ _3_bytes_x1000    38.65 µs      │ 62.86 µs      │ 41.17 µs      │ 43.02 µs      │ 100     │ 100
-├─ hud_slice_by_8                     │               │               │               │         │
-│  ├─ _100_bytes        97.68 ns      │ 6.478 µs      │ 113.6 ns      │ 180.7 ns      │ 100     │ 100
-│  ├─ _100_bytes_x1000  61.4 µs       │ 112.1 µs      │ 65.5 µs       │ 70.94 µs      │ 100     │ 100
-│  ├─ _10_bytes         11.78 ns      │ 61.81 ns      │ 12.41 ns      │ 13.79 ns      │ 100     │ 25600
-│  ├─ _10_bytes_x1000   14.12 µs      │ 39.69 µs      │ 14.63 µs      │ 15.87 µs      │ 100     │ 100
-│  ├─ _30_bytes         33.48 ns      │ 1.39 µs       │ 33.84 ns      │ 50.4 ns       │ 100     │ 6400
-│  ├─ _30_bytes_x1000   30.5 µs       │ 52.96 µs      │ 33.36 µs      │ 34.4 µs       │ 100     │ 100
-│  ├─ _3_bytes          8.528 ns      │ 59.28 ns      │ 8.81 ns       │ 9.651 ns      │ 100     │ 25600
-│  ╰─ _3_bytes_x1000    8.153 µs      │ 21.71 µs      │ 8.415 µs      │ 8.719 µs      │ 100     │ 100
-├─ meowhash                           │               │               │               │         │
-│  ├─ _100_bytes        78.68 ns      │ 1.758 µs      │ 80.68 ns      │ 97.98 ns      │ 100     │ 100
-│  ├─ _100_bytes_x1000  64.5 µs       │ 95.34 µs      │ 69.32 µs      │ 71.86 µs      │ 100     │ 100
-│  ├─ _10_bytes         57.68 ns      │ 63.99 ns      │ 58.06 ns      │ 58.15 ns      │ 100     │ 3200
-│  ├─ _10_bytes_x1000   55.8 µs       │ 85.74 µs      │ 59.43 µs      │ 61.46 µs      │ 100     │ 100
-│  ├─ _30_bytes         53.59 ns      │ 463.5 ns      │ 57.15 ns      │ 64.37 ns      │ 100     │ 3200
-│  ├─ _30_bytes_x1000   56.25 µs      │ 100.3 µs      │ 59.96 µs      │ 63.75 µs      │ 100     │ 100
-│  ├─ _3_bytes          56.52 ns      │ 220.2 ns      │ 58.4 ns       │ 59.79 ns      │ 100     │ 3200
-│  ╰─ _3_bytes_x1000    54.92 µs      │ 179.4 µs      │ 59.45 µs      │ 64.22 µs      │ 100     │ 100
-├─ rustc_hash                         │               │               │               │         │
-│  ├─ _100_bytes        1.575 ns      │ 5.994 ns      │ 1.577 ns      │ 1.627 ns      │ 100     │ 102400
-│  ├─ _100_bytes_x1000  13.66 µs      │ 31.75 µs      │ 14.22 µs      │ 15.08 µs      │ 100     │ 100
-│  ├─ _10_bytes         1.638 ns      │ 13.53 ns      │ 1.639 ns      │ 1.76 ns       │ 100     │ 102400
-│  ├─ _10_bytes_x1000   9.719 µs      │ 36.38 µs      │ 10.02 µs      │ 10.65 µs      │ 100     │ 100
-│  ├─ _30_bytes         1.889 ns      │ 15.14 ns      │ 1.96 ns       │ 2.195 ns      │ 100     │ 102400
-│  ├─ _30_bytes_x1000   9.719 µs      │ 22.72 µs      │ 10.34 µs      │ 10.61 µs      │ 100     │ 100
-│  ├─ _3_bytes          1.817 ns      │ 21.57 ns      │ 1.826 ns      │ 2.083 ns      │ 100     │ 102400
-│  ╰─ _3_bytes_x1000    3.568 µs      │ 17.06 µs      │ 3.575 µs      │ 3.764 µs      │ 100     │ 100
-├─ wyhash                             │               │               │               │         │
-│  ├─ _100_bytes        16.42 ns      │ 110.9 ns      │ 17.06 ns      │ 17.92 ns      │ 100     │ 12800
-│  ├─ _100_bytes_x1000  18.59 µs      │ 46.36 µs      │ 19.87 µs      │ 20.76 µs      │ 100     │ 100
-│  ├─ _10_bytes         9.13 ns       │ 9.169 ns      │ 9.161 ns      │ 9.151 ns      │ 100     │ 25600
-│  ├─ _10_bytes_x1000   10.56 µs      │ 28.27 µs      │ 10.91 µs      │ 11.73 µs      │ 100     │ 100
-│  ├─ _30_bytes         11.44 ns      │ 64.27 ns      │ 11.61 ns      │ 12.46 ns      │ 100     │ 25600
-│  ├─ _30_bytes_x1000   11.74 µs      │ 29.22 µs      │ 12.49 µs      │ 13.22 µs      │ 100     │ 100
-│  ├─ _3_bytes          9.149 ns      │ 58.52 ns      │ 9.47 ns       │ 9.937 ns      │ 100     │ 25600
-│  ╰─ _3_bytes_x1000    7.599 µs      │ 20.92 µs      │ 8.087 µs      │ 8.403 µs      │ 100     │ 100
-├─ xxh3                               │               │               │               │         │
-│  ├─ _100_bytes        2.93 ns       │ 7.499 ns      │ 2.931 ns      │ 2.979 ns      │ 100     │ 102400
-│  ├─ _100_bytes_x1000  17.57 µs      │ 30.87 µs      │ 18.14 µs      │ 18.72 µs      │ 100     │ 100
-│  ├─ _10_bytes         2.831 ns      │ 15.61 ns      │ 2.932 ns      │ 3.026 ns      │ 100     │ 102400
-│  ├─ _10_bytes_x1000   10.66 µs      │ 23.82 µs      │ 11 µs         │ 11.37 µs      │ 100     │ 100
-│  ├─ _30_bytes         2.734 ns      │ 51.68 ns      │ 2.833 ns      │ 3.942 ns      │ 100     │ 102400
-│  ├─ _30_bytes_x1000   11.56 µs      │ 31.44 µs      │ 12.31 µs      │ 12.76 µs      │ 100     │ 100
-│  ├─ _3_bytes          2.735 ns      │ 6.887 ns      │ 2.933 ns      │ 2.924 ns      │ 100     │ 102400
-│  ╰─ _3_bytes_x1000    4.069 µs      │ 17.18 µs      │ 4.334 µs      │ 4.752 µs      │ 100     │ 100
-╰─ xxhash_rust_xxh3                   │               │               │               │         │
-   ├─ _100_bytes        50.68 ns      │ 3.465 µs      │ 54.68 ns      │ 90.86 ns      │ 100     │ 100
-   ├─ _100_bytes_x1000  35.55 µs      │ 63.06 µs      │ 37.2 µs       │ 39.76 µs      │ 100     │ 100
-   ├─ _10_bytes         23.48 ns      │ 123 ns        │ 25.05 ns      │ 25.69 ns      │ 100     │ 12800
-   ├─ _10_bytes_x1000   24.92 µs      │ 53.82 µs      │ 27.39 µs      │ 29.1 µs       │ 100     │ 100
-   ├─ _30_bytes         23.2 ns       │ 126.8 ns      │ 24.7 ns       │ 25.43 ns      │ 100     │ 12800
-   ├─ _30_bytes_x1000   24.52 µs      │ 51.26 µs      │ 26.96 µs      │ 27.73 µs      │ 100     │ 100
-   ├─ _3_bytes          18.62 ns      │ 210.7 ns      │ 18.68 ns      │ 21.1 ns       │ 100     │ 12800
-   ╰─ _3_bytes_x1000    18.26 µs      │ 51.02 µs      │ 20.03 µs      │ 20.99 µs      │ 100     │ 100
+short article/xxh3      time:   [5.0451 µs 5.1039 µs 5.1657 µs]
+Found 8 outliers among 100 measurements (8.00%)
+  6 (6.00%) high mild
+  2 (2.00%) high severe
+short article/meowhash  time:   [3.6227 µs 3.6376 µs 3.6538 µs]
+Found 7 outliers among 100 measurements (7.00%)
+  4 (4.00%) high mild
+  3 (3.00%) high severe
+short article/ahash     time:   [3.3402 µs 3.3721 µs 3.4077 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+short article/fasthash  time:   [14.076 µs 14.145 µs 14.222 µs]
+Found 9 outliers among 100 measurements (9.00%)
+  5 (5.00%) high mild
+  4 (4.00%) high severe
+short article/default_hasher
+                        time:   [28.108 µs 28.360 µs 28.654 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+short article/rustc_hash
+                        time:   [6.8942 µs 6.9465 µs 7.0034 µs]
+short article/fnv       time:   [137.33 µs 137.52 µs 137.71 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+short article/xxhash_rust_xxh3
+                        time:   [5.2465 µs 5.3275 µs 5.4104 µs]
+Found 7 outliers among 100 measurements (7.00%)
+  7 (7.00%) high mild
+short article/highway   time:   [11.465 µs 11.531 µs 11.606 µs]
+Found 8 outliers among 100 measurements (8.00%)
+  4 (4.00%) high mild
+  4 (4.00%) high severe
+short article/cityhasher
+                        time:   [7.9841 µs 8.0283 µs 8.0729 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high severe
+short article/gxhash    time:   [1.9131 µs 1.9261 µs 1.9391 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+short article/wyhash    time:   [7.0290 µs 7.0850 µs 7.1453 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  3 (3.00%) high mild
+  3 (3.00%) high severe
+short article/blake3    time:   [58.354 µs 58.910 µs 59.452 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  1 (1.00%) high mild
+  2 (2.00%) high severe
+short article/hud_slice_by_8
+                        time:   [53.056 µs 53.297 µs 53.561 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+
+long article/xxh3 #2    time:   [284.13 µs 286.35 µs 288.71 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+long article/meowhash #2
+                        time:   [197.03 µs 198.45 µs 199.86 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+long article/ahash #2   time:   [173.64 µs 175.24 µs 176.88 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+long article/fasthash #2
+                        time:   [749.50 µs 754.16 µs 759.43 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+Benchmarking long article/default_hasher #2: Warming up for 3.0000 s
+Warning: Unable to complete 100 samples in 5.0s. You may wish to increase target time to 7.4s, enable flat sampling, or reduce sample count to 50.
+long article/default_hasher #2
+                        time:   [1.4833 ms 1.4971 ms 1.5120 ms]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+long article/rustc_hash #2
+                        time:   [385.13 µs 387.60 µs 390.31 µs]
+Found 7 outliers among 100 measurements (7.00%)
+  7 (7.00%) high mild
+long article/fnv #2     time:   [7.0786 ms 7.1247 ms 7.1811 ms]
+Found 6 outliers among 100 measurements (6.00%)
+  1 (1.00%) high mild
+  5 (5.00%) high severe
+long article/xxhash_rust_xxh3 #2
+                        time:   [297.87 µs 301.27 µs 304.91 µs]
+long article/highway #2 time:   [594.74 µs 599.08 µs 603.88 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+long article/cityhasher #2
+                        time:   [416.98 µs 420.40 µs 424.08 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+long article/gxhash #2  time:   [122.49 µs 122.98 µs 123.52 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  2 (2.00%) high mild
+  2 (2.00%) high severe
+long article/wyhash #2  time:   [396.98 µs 401.12 µs 405.20 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+long article/blake3 #2  time:   [3.0959 ms 3.1280 ms 3.1611 ms]
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) high mild
+long article/hud_slice_by_8 #2
+                        time:   [2.6893 ms 2.7001 ms 2.7112 ms]
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) high mild
+
+== comparison/short     time:   [2.1493 ns 2.1593 ns 2.1701 ns]
+Found 4 outliers among 100 measurements (4.00%)
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+== comparison/long      time:   [2.1194 ns 2.1282 ns 2.1369 ns]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+== comparison/true      time:   [69.592 µs 70.251 µs 70.840 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+
+     Running benches/small.rs (target/release/deps/small-723a008c8061be06)
+3 bytes (1000 times)/xxh3
+                        time:   [4.1116 µs 4.1811 µs 4.2525 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  6 (6.00%) low mild
+3 bytes (1000 times)/meowhash
+                        time:   [47.834 µs 48.917 µs 50.001 µs]
+3 bytes (1000 times)/ahash
+                        time:   [5.3466 µs 5.4952 µs 5.6381 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  3 (3.00%) high mild
+  3 (3.00%) high severe
+3 bytes (1000 times)/fasthash
+                        time:   [6.1808 µs 6.2895 µs 6.4057 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+3 bytes (1000 times)/default_hasher
+                        time:   [9.9716 µs 10.065 µs 10.161 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+3 bytes (1000 times)/rustc_hash
+                        time:   [3.0213 µs 3.0850 µs 3.1601 µs]
+3 bytes (1000 times)/fnv
+                        time:   [3.1022 µs 3.1393 µs 3.1793 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+3 bytes (1000 times)/xxhash_rust_xxh3
+                        time:   [19.356 µs 19.598 µs 19.846 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+3 bytes (1000 times)/highway
+                        time:   [40.717 µs 41.101 µs 41.495 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  2 (2.00%) high mild
+  1 (1.00%) high severe
+3 bytes (1000 times)/cityhasher
+                        time:   [8.3796 µs 8.5445 µs 8.7406 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+3 bytes (1000 times)/gxhash
+                        time:   [13.222 µs 13.251 µs 13.280 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+3 bytes (1000 times)/wyhash
+                        time:   [6.6518 µs 6.7212 µs 6.7847 µs]
+3 bytes (1000 times)/blake3
+                        time:   [88.430 µs 89.040 µs 89.642 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+3 bytes (1000 times)/hud_slice_by_8
+                        time:   [7.9541 µs 8.1554 µs 8.3395 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+
+10 bytes (1000 times)/xxh3
+                        time:   [13.361 µs 13.407 µs 13.457 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+10 bytes (1000 times)/meowhash
+                        time:   [47.581 µs 48.307 µs 49.039 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+10 bytes (1000 times)/ahash
+                        time:   [14.337 µs 14.411 µs 14.493 µs]
+Found 10 outliers among 100 measurements (10.00%)
+  7 (7.00%) high mild
+  3 (3.00%) high severe
+10 bytes (1000 times)/fasthash
+                        time:   [16.461 µs 16.502 µs 16.544 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+10 bytes (1000 times)/default_hasher
+                        time:   [16.948 µs 17.017 µs 17.091 µs]
+Found 11 outliers among 100 measurements (11.00%)
+  8 (8.00%) high mild
+  3 (3.00%) high severe
+10 bytes (1000 times)/rustc_hash
+                        time:   [12.530 µs 12.548 µs 12.569 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+10 bytes (1000 times)/fnv
+                        time:   [7.1865 µs 7.3080 µs 7.4252 µs]
+Found 3 outliers among 100 measurements (3.00%)
+  3 (3.00%) high mild
+10 bytes (1000 times)/xxhash_rust_xxh3
+                        time:   [25.652 µs 25.755 µs 25.870 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  3 (3.00%) high mild
+  2 (2.00%) high severe
+10 bytes (1000 times)/highway
+                        time:   [40.261 µs 40.754 µs 41.320 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  4 (4.00%) high mild
+  2 (2.00%) high severe
+10 bytes (1000 times)/cityhasher
+                        time:   [16.024 µs 16.057 µs 16.092 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  5 (5.00%) high mild
+  1 (1.00%) high severe
+10 bytes (1000 times)/gxhash
+                        time:   [13.187 µs 13.217 µs 13.247 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  2 (2.00%) high mild
+10 bytes (1000 times)/wyhash
+                        time:   [12.472 µs 12.518 µs 12.571 µs]
+Found 7 outliers among 100 measurements (7.00%)
+  6 (6.00%) high mild
+  1 (1.00%) high severe
+10 bytes (1000 times)/blake3
+                        time:   [86.626 µs 87.082 µs 87.573 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+10 bytes (1000 times)/hud_slice_by_8
+                        time:   [14.992 µs 15.037 µs 15.086 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  2 (2.00%) high mild
+  3 (3.00%) high severe
+
+100 bytes (1000 times)/xxh3
+                        time:   [17.051 µs 17.115 µs 17.185 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  5 (5.00%) high mild
+  1 (1.00%) high severe
+100 bytes (1000 times)/meowhash
+                        time:   [57.203 µs 58.119 µs 59.038 µs]
+Found 1 outliers among 100 measurements (1.00%)
+  1 (1.00%) high mild
+100 bytes (1000 times)/ahash
+                        time:   [23.247 µs 23.345 µs 23.437 µs]
+Found 8 outliers among 100 measurements (8.00%)
+  7 (7.00%) high mild
+  1 (1.00%) high severe
+100 bytes (1000 times)/fasthash
+                        time:   [29.579 µs 29.709 µs 29.848 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+100 bytes (1000 times)/default_hasher
+                        time:   [30.265 µs 30.521 µs 30.776 µs]
+Found 6 outliers among 100 measurements (6.00%)
+  4 (4.00%) high mild
+  2 (2.00%) high severe
+100 bytes (1000 times)/rustc_hash
+                        time:   [17.957 µs 18.010 µs 18.073 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
+100 bytes (1000 times)/fnv
+                        time:   [101.52 µs 101.90 µs 102.42 µs]
+Found 9 outliers among 100 measurements (9.00%)
+  5 (5.00%) high mild
+  4 (4.00%) high severe
+100 bytes (1000 times)/xxhash_rust_xxh3
+                        time:   [36.268 µs 36.539 µs 36.826 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  3 (3.00%) high mild
+  1 (1.00%) high severe
+100 bytes (1000 times)/highway
+                        time:   [50.776 µs 51.446 µs 52.177 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+100 bytes (1000 times)/cityhasher
+                        time:   [30.535 µs 30.638 µs 30.746 µs]
+Found 4 outliers among 100 measurements (4.00%)
+  4 (4.00%) high mild
+100 bytes (1000 times)/gxhash
+                        time:   [22.754 µs 22.832 µs 22.922 µs]
+Found 8 outliers among 100 measurements (8.00%)
+  6 (6.00%) high mild
+  2 (2.00%) high severe
+100 bytes (1000 times)/wyhash
+                        time:   [18.199 µs 18.278 µs 18.357 µs]
+Found 2 outliers among 100 measurements (2.00%)
+  1 (1.00%) high mild
+  1 (1.00%) high severe
+100 bytes (1000 times)/blake3
+                        time:   [157.20 µs 158.13 µs 159.18 µs]
+Found 8 outliers among 100 measurements (8.00%)
+  5 (5.00%) high mild
+  3 (3.00%) high severe
+100 bytes (1000 times)/hud_slice_by_8
+                        time:   [50.536 µs 51.359 µs 52.232 µs]
+Found 5 outliers among 100 measurements (5.00%)
+  4 (4.00%) high mild
+  1 (1.00%) high severe
 ```
 
 As you can see, the default `stringA == stringB` is about 10^6 times faster than the fastest hashing algorithm. So yeah, hashing is slower than comparing (at least in Rust). This was tested on the `article*.txt` files you see on the file tree.
@@ -220,4 +395,4 @@ To see the full Criterion report [check here](https://github.com/rosetta-rs/hash
 
 (Git and Cargo must be installed)
 
-Just clone this repo with `git clone https://github.com/rosetta-rs/hashing-rosetta-rs` or download the ZIP with the green button, and run `cargo bench`.
+Just clone this repo with `git clone https://github.com/rosetta-rs/hashing-rosetta-rs` or download the ZIP with the green button, and run `RUSTFLAGS="-C target-cpu=native"cargo bench`.
