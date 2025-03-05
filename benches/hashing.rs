@@ -34,6 +34,7 @@ fn benchmark_short(c: &mut Criterion) {
         hud_slice_by_8,
         __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
     );
+    generate_functions!(rapidhash, ::rapidhash::rapidhash);
     group.finish();
 }
 
@@ -70,6 +71,7 @@ fn benchmark_long(c: &mut Criterion) {
         hud_slice_by_8,
         __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
     );
+    generate_functions!(rapidhash, ::rapidhash::rapidhash);
 }
 
 fn benchmark_equal(c: &mut Criterion) {
@@ -105,6 +107,7 @@ fn benchmark_equal(c: &mut Criterion) {
         hud_slice_by_8,
         __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
     );
+    generate_functions!(rapidhash, ::rapidhash::rapidhash);
 }
 
 fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {

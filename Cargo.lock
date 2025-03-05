@@ -357,6 +357,7 @@ dependencies = [
  "hud-slice-by-8",
  "meowhash",
  "paste",
+ "rapidhash",
  "rustc-hash",
  "twox-hash",
  "wyhash",
@@ -585,6 +586,12 @@ checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
 ]
+
+[[package]]
+name = "rapidhash"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9813f789f95ee4fe6b4d01834404d7cccacbc3f6c029343af910b3c2835eb9f1"
 
 [[package]]
 name = "rayon"

@@ -33,6 +33,7 @@ fn benchmark_3_bytes(c: &mut Criterion) {
         hud_slice_by_8,
         __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
     );
+    generate_functions!(rapidhash, ::rapidhash::rapidhash);
 }
 
 fn benchmark_10_bytes(c: &mut Criterion) {
@@ -77,6 +78,7 @@ fn benchmark_10_bytes(c: &mut Criterion) {
         hud_slice_by_8,
         __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
     );
+    generate_functions!(rapidhash, ::rapidhash::rapidhash);
 }
 
 fn benchmark_100_bytes(c: &mut Criterion) {
@@ -212,6 +214,7 @@ fn benchmark_100_bytes(c: &mut Criterion) {
         hud_slice_by_8,
         __hash::<::hud_slice_by_8::crc32::CRC32Hasher>
     );
+    generate_functions!(rapidhash, ::rapidhash::rapidhash);
 }
 
 fn __hash<H: Hasher + Default>(input: &[u8]) -> u64 {
